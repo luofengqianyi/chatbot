@@ -1,0 +1,40 @@
+# ─── 环境变量与密钥（绝对不能提交） ───
+.env
+.env.production
+.env.local
+.env.*.local
+
+# ─── 数据库 ───
+*.db
+*.sqlite3
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+Pipfile.lock
+
+# ─── 上传文件 ───
+/uploads/
+
+# ─── 操作系统 ───
+.DS_Store
+Thumbs.db
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Docker ───
+/deploy/ssl/
+/deploy/certbot-www/
+
+# ─── 日志 ───
+*.log

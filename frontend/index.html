@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Auth Page -->
+<div id="authPage" class="auth-container">
+    <div class="auth-card">
+        <h1>AI Chatbot</h1>
+        <p class="subtitle">智能对话 · 图片分析 · 知识库问答</p>
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">登录</button>
+            <button class="auth-tab" data-tab="register">注册</button>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">用户名</label>
+                <input type="text" id="loginUsername" placeholder="输入用户名" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">密码</label>
+                <input type="password" id="loginPassword" placeholder="输入密码" required>
+            </div>
+            <button type="submit" class="btn btn-primary">登录</button>
+            <div class="auth-error" id="authError"></div>
+        </form>
+        <form id="registerForm" class="hidden">
+            <div class="form-group">
+                <label for="regUsername">用户名</label>
+                <input type="text" id="regUsername" placeholder="输入用户名 (2-50字符)" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label for="regPassword">密码</label>
+                <input type="password" id="regPassword" placeholder="输入密码 (至少6位)" required minlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary">注册</button>
+            <div class="auth-error" id="regError"></div>
+        </form>
+    </div>
+</div>
+
+<!-- Main App -->
+<div id="app" class="hidden">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>AI Chatbot</h2>
+        </div>
+        <div class="sidebar-user">
+            <div class="avatar" id="userAvatar">U</div>
+            <span id="usernameDisplay">用户</span>
+        </div>
+        <button class="new-chat-btn" id="newChatBtn">
+            ✦ 新建对话
+        </button>
+        <div class="session-list" id="sessionList">
+            <!-- Session items loaded dynamically -->
+        </div>
+        <div class="sidebar-footer">
+            <button class="btn btn-danger" id="logoutBtn">退出登录</button>
+        </div>
+    </div>
+
+    <!-- Main Area -->
+    <div class="main-area">
+        <div class="chat-header">
+            <h3 id="currentSessionTitle">新对话</h3>
+            <div class="model-selector">
+                <select id="modelSelect">
+                    <option value="qwen3.7-plus">qwen3.7-plus</option>
+                    <option value="qwen-vl-plus">qwen-vl-plus</option>
+                    <option value="qwen-vl-max">qwen-vl-max</option>
+                </select>
+            </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages loaded dynamically -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-icon">✦</div>
+                <h3>开始对话</h3>
+                <p>在下方输入消息，或上传图片/PDF文件开始智能对话</p>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <div id="uploadPreview" class="upload-preview hidden">
+                <span class="file-name" id="uploadFileName"></span>
+                <button class="remove-btn" id="removeUploadBtn">×</button>
+            </div>
+            <div class="input-container">
+                <textarea id="messageInput" rows="1" placeholder="输入消息..." style="flex:1;border:none;background:transparent;resize:none;font-size:14px;font-family:inherit;padding:4px 0;max-height:120px;outline:none;line-height:1.5;" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+                <div class="input-actions">
+                    <button class="btn-icon" id="imageUploadBtn" title="上传图片">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </button>
+                    <button class="btn-icon" id="pdfUploadBtn" title="上传PDF">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </button>
+                    <button class="send-btn" id="sendBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden file inputs -->
+<input type="file" id="imageInput" accept="image/*" style="display:none">
+<input type="file" id="pdfInput" accept="application/pdf" style="display:none">
+
+<script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

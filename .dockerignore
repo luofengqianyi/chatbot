@@ -1,0 +1,12 @@
+ __pycache__
+*.pyc
+.env
+.git
+chatbot.db
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+README.md
+start.bat
