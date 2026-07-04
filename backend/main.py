@@ -15,7 +15,14 @@ from routers.chat_routes import router as chat_router
 
 app = FastAPI(title=settings.APP_NAME)
 
-FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+# FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+
+# 获取当前文件所在目录 (backend)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 项目根目录 (chatbot)
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+# frontend 目录
+FRONTEND_DIR = os.path.join(PROJECT_ROOT, "frontend")
 
 # CORS (still useful for CDN assets)
 app.add_middleware(
