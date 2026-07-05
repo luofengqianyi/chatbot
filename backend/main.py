@@ -21,8 +21,8 @@ app = FastAPI(title=settings.APP_NAME)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # 项目根目录 (chatbot)
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
-# frontend 目录
-FRONTEND_DIR = os.path.join(PROJECT_ROOT, "frontend")
+# FRONTEND_DIR: Docker uses env var, local dev uses PROJECT_ROOT
+FRONTEND_DIR = os.getenv("FRONTEND_DIR", os.path.join(PROJECT_ROOT, "frontend"))
 
 # CORS (still useful for CDN assets)
 app.add_middleware(
@@ -73,3 +73,5 @@ def health():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8888)
+# FRONTEND_DIR: Docker uses env var, local dev uses PROJECT_ROOT
+FRONTEND_DIR = os.getenv("FRONTEND_DIR", os.path.join(PROJECT_ROOT, "frontend"))

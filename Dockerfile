@@ -1,28 +1,35 @@
- # ============================================
+# ============================================
 # AI Chatbot - Backend Dockerfile
-# Build: docker build -t chatbot-backend -f Dockerfile .
+# Build: docker build -t chatbot-backend .
+# Deploy: Railway (uses $PORT env var)
 # ============================================
 
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# 安装系统依赖（pypdf 等可能需要）
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# 先装依赖（利用 Docker layer 缓存）
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies first (Docker layer cache)
+COPY backend/requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir gunicorn
 
-# 复制后端代码
-COPY backend/ .
+# Copy backend code
+COPY backend/ /app/
 
-# 上传目录
+# Copy frontend (served by FastAPI at /)
+COPY frontend/ /app/frontend/
+
+# Create upload directories
 RUN mkdir -p /app/uploads/images /app/uploads/pdfs
 
-EXPOSE 8888
+# Set path overrides for Docker layout (pydantic-settings reads env vars)
+ENV UPLOAD_DIR=/app/uploads
+ENV FRONTEND_DIR=/app/frontend
 
-# 生产建议用 gunicorn + uvicorn workers
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--workers", "4", "--bind", "0.0.0.0:8888", "--timeout", "120"]
+# Railway assigns $PORT dynamically (shell form so $PORT expands)
+CMD gunicorn -k uvicorn.workers.UvicornWorker main:app --workers 4 --bind 0.0.0.0:$PORT --timeout 120
